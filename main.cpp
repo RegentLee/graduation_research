@@ -1,6 +1,10 @@
 #include <iostream>
+#include "csv.h"
 
 int main() {
-    std::cout << "Hello, World!" << std::endl;
+    std::vector<std::vector<int> > pattern;
+    std::vector<std::vector<int> > learning_sample;
+
+
     return 0;
 }
