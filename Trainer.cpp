@@ -4,6 +4,8 @@
 
 #include "Trainer.h"
 
+#include <unistd.h>
+
 using namespace std;
 
 void Trainer::fit(SDNN &model, vector<vector<int> > sample, int max_epoch, int batch_size) {
@@ -36,22 +38,30 @@ void Trainer::fit(SDNN &model, vector<vector<int> > sample, int max_epoch, int b
 
             output = model.Forward(input);
             model.Backward(output, target);
+
+            //usleep(1000000);
+            cout << "\r" << "epoch: " << epoch + 1 << "/" << max_epoch
+                 << " iters: " << iters + 1 << "/" << max_iters << flush;// << string(20, ' ') ;
         }
 
-        vector<vector<int> > input(sample.size() - max_iters*batch_size, vector<int>(sample[0].size() - 1));
-        vector<int> target(sample.size() - max_iters*batch_size);
-        vector<vector<int> > output;
+        if(batch_size*max_iters != sample.size()){
+            vector<vector<int> > input(sample.size() - max_iters*batch_size, vector<int>(sample[0].size() - 1));
+            vector<int> target(sample.size() - max_iters*batch_size);
+            vector<vector<int> > output;
 
-        for(int i = 0; i < input.size(); i++){
-            input[i].assign(data[max_iters*batch_size + i].begin(), data[max_iters*batch_size + i].end() - 1);
-            target[i] = data[max_iters*batch_size + i].back();
-            //printf("except   input:%d, %d, epoch:%d, target:%d\n", input[i][0], input[i][1], epoch, target[i]);
+            for(int i = 0; i < input.size(); i++){
+                input[i].assign(data[max_iters*batch_size + i].begin(), data[max_iters*batch_size + i].end() - 1);
+                target[i] = data[max_iters*batch_size + i].back();
+                //printf("except   input:%d, %d, epoch:%d, target:%d\n", input[i][0], input[i][1], epoch, target[i]);
+            }
+
+            output = model.Forward(input);
+            model.Backward(output, target);
         }
 
-        output = model.Forward(input);
-        model.Backward(output, target);
-        
-        cout << "\r" << epoch + 1 << "/" << max_epoch << flush;// << string(20, ' ') ;
+
+//        usleep(1000000);
+        //cout << "\r" << "epoch: " << epoch + 1 << "/" << max_epoch << flush;// << string(20, ' ') ;
     }
     cout << endl;
 }
