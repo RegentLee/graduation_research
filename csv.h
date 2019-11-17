@@ -5,8 +5,6 @@
 #ifndef GRADUATION_RESEARCH_CSV_H
 #define GRADUATION_RESEARCH_CSV_H
 
-#endif //GRADUATION_RESEARCH_CSV_H
-
 #include <vector>
 
 namespace csv {
@@ -18,3 +16,5 @@ namespace csv {
     void ReadCsv(std::vector<std::vector<float> >& map, char *fp);
     void ToCsv(std::vector<std::vector<float> >& map, char *fp);
 }
+
+#endif //GRADUATION_RESEARCH_CSV_H

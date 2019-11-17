@@ -5,9 +5,8 @@
 #ifndef GRADUATION_RESEARCH_SDNN_H
 #define GRADUATION_RESEARCH_SDNN_H
 
-#endif //GRADUATION_RESEARCH_SDNN_H
-
 #include <vector>
+#include <random>
 
 class SDNN {
 public:
@@ -26,3 +25,5 @@ private:
     std::vector<std::vector<int> > NNForward(std::vector<std::vector<int> > nn_input);
     void NNBackward(std::vector<std::vector<int> > output, std::vector<std::vector<int> > target);
 };
+
+#endif //GRADUATION_RESEARCH_SDNN_H

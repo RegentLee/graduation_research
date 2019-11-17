@@ -2,7 +2,7 @@
 // Created by 李明曄 on 2019/11/16.
 //
 
-#include <random>
+
 #include "SDNN.h"
 
 using namespace std;
@@ -32,6 +32,7 @@ void SDNN::MakeRandomPattern(vector<vector<int> > pattern,
 
     vector<int> range(pattern[0].size());
     mt19937_64 mt(static_cast<unsigned int>(time(nullptr)));
+    //mt19937_64 mt(0);
 
     for(int i = 0; i < pattern[0].size(); i++) range[i] = i;
     for(int i = 0; i < random_pattern.size(); i++){
@@ -49,12 +50,15 @@ vector<vector<int> > SDNN::Forward(std::vector<std::vector<int> > input) {
     vector<vector<int> > nn_output(input.size(), vector<int>(original_pattern[0].size()));
     nn_input = SDNN::SD(input);
     nn_ip.resize(nn_input.size());
+    nn_ip.assign(nn_input.begin(), nn_input.end());
+/*
     for(int i = 0; i < nn_input.size(); i++){
         nn_ip[i].resize(nn_input[0].size());
         for(int j = 0; j < nn_input[0].size(); j++){
             nn_ip[i][j] = nn_input[i][j];
         }
     }
+*/
     nn_output = SDNN::NNForward(nn_input);
 
     return nn_output;
@@ -73,8 +77,10 @@ vector<vector<int> > SDNN::SD(std::vector<std::vector<int> > input) {
                     s_temp[j] = ((1 + random_pattern[c][input[i][c]][j])/2)*original_pattern[input[i][s]][j];
                     c_temp[j] = ((1 + random_pattern[s][input[i][s]][j])/2)*original_pattern[input[i][c]][j];
                 }
-                for(int j = 0; j < original_pattern[0].size(); j++) nn_input[i].push_back(s_temp[j]);
-                for(int j = 0; j < original_pattern[0].size(); j++) nn_input[i].push_back(c_temp[j]);
+                nn_input[i].insert(nn_input[i].end(), s_temp.begin(), s_temp.end());
+                nn_input[i].insert(nn_input[i].end(), c_temp.begin(), c_temp.end());
+                //for(int j = 0; j < original_pattern[0].size(); j++) nn_input[i].push_back(s_temp[j]);
+                //for(int j = 0; j < original_pattern[0].size(); j++) nn_input[i].push_back(c_temp[j]);
             }
         }
     }
@@ -132,7 +138,7 @@ void SDNN::NNBackward(vector<vector<int> > output, vector<vector<int> > target) 
     for(int i = 0; i < nn_ip[0].size(); i++){
         for(int j = 0; j < loss[0].size(); j++){
             for(int k = 0; k < loss.size(); k++){
-                //printf("nn_ip:%f, loss:%f\n", (float)nn_ip[k][i], loss[k][j]);
+                //printf("nn_ip:%f, loss:%f, ", (float)nn_ip[k][i], loss[k][j]);
                 grad[i][j] += (float)nn_ip[k][i]*loss[k][j];
                 //printf("i:%d, j:%d, k:%d, grad[i][j]:%f\n", i, j, k, grad[i][j]);
             }
@@ -142,7 +148,10 @@ void SDNN::NNBackward(vector<vector<int> > output, vector<vector<int> > target) 
     //printf("weight.size():%d, weight[0].size():%d\n", weight.size(), weight[0].size());
     //printf("grad.size():%d, grad[0].size():%d\n", grad.size(), grad[0].size());
     for(int i = 0; i < weight.size(); i++){
-        for(int j = 0; j < weight[0].size(); j++) weight[i][j] -= grad[i][j];
+        for(int j = 0; j < weight[0].size(); j++){
+            weight[i][j] -= grad[i][j];
+            //printf("%f\n", weight[i][j]);
+        }
     }
     //printf("%s\n", "after weight");
 }
