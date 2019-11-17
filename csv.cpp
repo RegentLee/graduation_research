@@ -12,7 +12,7 @@
 using namespace std;
 
 // int 値の csv ファイルを読み込む
-void csv::ReadCsv(vector<vector<int> >& map, char *fp) {
+void csv::ReadCsv(vector<vector<int> >& map, string fp) {
     ifstream ifs(fp);
 
     string one_line;
@@ -31,7 +31,7 @@ void csv::ReadCsv(vector<vector<int> >& map, char *fp) {
 }
 
 // int 値の csv ファイルを書き込む
-void csv::ToCsv(vector<vector<int> >& map, char *fp) {
+void csv::ToCsv(vector<vector<int> >& map, string fp) {
     ofstream ofs;
     ofs.open(fp, ios::out | ios::trunc);
 
@@ -47,7 +47,7 @@ void csv::ToCsv(vector<vector<int> >& map, char *fp) {
 }
 
 // float 値の csv ファイルを読み込む
-void csv::ReadCsv(vector<vector<float> >& map, char *fp) {
+void csv::ReadCsv(vector<vector<float> >& map, string fp) {
     ifstream ifs(fp);
 
     string one_line;
@@ -66,7 +66,7 @@ void csv::ReadCsv(vector<vector<float> >& map, char *fp) {
 }
 
 // float 値の csv ファイルを書き込む
-void csv::ToCsv(vector<vector<float> >& map, char *fp) {
+void csv::ToCsv(vector<vector<float> >& map, string fp) {
     ofstream ofs;
     ofs.open(fp, ios::out | ios::trunc);
 
