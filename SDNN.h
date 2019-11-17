@@ -16,7 +16,6 @@ public:
     void Backward(std::vector<std::vector<int> > output, std::vector<int> target);
 
 private:
-    int input_s;
     std::vector<std::vector<int> > original_pattern;
     std::vector<std::vector<std::vector<int> > > random_pattern;
     std::vector<std::vector<int> > nn_ip;

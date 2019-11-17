@@ -8,13 +8,12 @@
 using namespace std;
 
 SDNN::SDNN(int input_size, std::vector<std::vector<int> > pattern) {
-
-    input_s = input_size;
-
     original_pattern.resize(pattern.size());
     for(int i = 0; i < pattern.size(); i++){
-        original_pattern.resize(pattern[0].size());
-        for(int j = 0; j < pattern[0].size(); j++) original_pattern[i][j] = pattern[i][j];
+        original_pattern[i].resize(pattern[0].size());
+        for(int j = 0; j < pattern[0].size(); j++){
+            original_pattern[i][j] = pattern[i][j];
+        }
     }
 
     random_pattern.resize(input_size);
@@ -36,14 +35,12 @@ void SDNN::MakeRandomPattern(vector<vector<int> > pattern,
 
     for(int i = 0; i < pattern[0].size(); i++) range[i] = i;
     for(int i = 0; i < random_pattern.size(); i++){
-        vector<vector<int> > rp(pattern.size(), vector<int>(pattern[0].size()));
         shuffle(range.begin(), range.end(), mt);
         for(int j = 0; j < pattern.size(); j++){
             for(int k = 0; k < pattern[0].size(); k++){
-                rp[j][k] = pattern[j][range[k]];
+                random_pattern[i][j][k] = pattern[j][range[k]];
             }
         }
-        random_pattern.push_back(rp);
     }
 }
 
@@ -51,12 +48,15 @@ vector<vector<int> > SDNN::Forward(std::vector<std::vector<int> > input) {
     vector<vector<int> > nn_input(input.size());
     vector<vector<int> > nn_output(input.size(), vector<int>(original_pattern[0].size()));
     nn_input = SDNN::SD(input);
+    nn_ip.resize(nn_input.size());
     for(int i = 0; i < nn_input.size(); i++){
+        nn_ip[i].resize(nn_input[0].size());
         for(int j = 0; j < nn_input[0].size(); j++){
             nn_ip[i][j] = nn_input[i][j];
         }
     }
     nn_output = SDNN::NNForward(nn_input);
+
     return nn_output;
 }
 
@@ -83,6 +83,7 @@ vector<vector<int> > SDNN::SD(std::vector<std::vector<int> > input) {
 }
 
 vector<vector<int> > SDNN::NNForward(vector<vector<int> > nn_input) {
+    //printf("%s\n", "before forward");
     vector<vector<int> > nn_output(nn_input.size(), vector<int>(original_pattern[0].size(), 0));
     for(int i = 0; i < nn_input.size(); i++){
         for(int j = 0; j < nn_input[0].size(); j++){
@@ -113,21 +114,37 @@ void SDNN::Backward(vector<vector<int> > output, vector<int> target) {
 
 void SDNN::NNBackward(vector<vector<int> > output, vector<vector<int> > target) {
     vector<vector<float> > loss(output.size(), vector<float>(output[0].size()));
-    vector<vector<float> > grad(output.size(), vector<float>(output[0].size(), 0));
+    vector<vector<float> > grad(weight.size(), vector<float>(weight[0].size(), 0));
     for(int i = 0; i < output.size(); i++){
         for(int j = 0; j < output[0].size(); j++){
+            //printf("i:%d, j:%d, output:%d, target:%d, ", i, j, output[i][j], target[i][j]);
             loss[i][j] = (float)(output[i][j] - target[i][j])/2.0;
             loss[i][j] /= output.size();
+            //printf("loss:%f\n", loss[i][j]);
         }
     }
-    for(int i = 0; i < nn_ip.size(); i++){
-        for(int j = 0; j < weight.size(); j++){
-            for(int k = 0; k < loss[0].size(); k++) grad[j][k] += (float)nn_ip[i][j]*loss[i][k];
+    //printf("%s\n", "before grad");
+    //printf("loss.size():%d, loss[0].size():%d\n", loss.size(), loss[0].size());
+    //printf("weight.size():%d, weight[0].size():%d\n", weight.size(), weight[0].size());
+    //printf("nn_ip.size():%d, nn_ip[0].size():%d\n", nn_ip.size(), nn_ip[0].size());
+    //printf("grad.size():%d, grad[0].size():%d\n", grad.size(), grad[0].size());
+
+    for(int i = 0; i < nn_ip[0].size(); i++){
+        for(int j = 0; j < loss[0].size(); j++){
+            for(int k = 0; k < loss.size(); k++){
+                //printf("nn_ip:%f, loss:%f\n", (float)nn_ip[k][i], loss[k][j]);
+                grad[i][j] += (float)nn_ip[k][i]*loss[k][j];
+                //printf("i:%d, j:%d, k:%d, grad[i][j]:%f\n", i, j, k, grad[i][j]);
+            }
         }
     }
+    //printf("%s\n", "before weight");
+    //printf("weight.size():%d, weight[0].size():%d\n", weight.size(), weight[0].size());
+    //printf("grad.size():%d, grad[0].size():%d\n", grad.size(), grad[0].size());
     for(int i = 0; i < weight.size(); i++){
         for(int j = 0; j < weight[0].size(); j++) weight[i][j] -= grad[i][j];
     }
+    //printf("%s\n", "after weight");
 }
 
 
