@@ -7,6 +7,7 @@
 
 #include <random>
 #include <iostream>
+#include <time.h>
 
 #include "SDNN.h"
 

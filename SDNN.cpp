@@ -156,4 +156,4 @@ void SDNN::NNBackward(vector<vector<int> > output, vector<vector<int> > target) 
     //printf("%s\n", "after weight");
 }
 
-
+vector<vector<int> > SDNN::GetPattern() { return original_pattern; }
