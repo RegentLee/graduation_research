@@ -136,10 +136,11 @@ void SDNN::NNBackward(vector<vector<int> > output, vector<vector<int> > target) 
     //printf("grad.size():%d, grad[0].size():%d\n", grad.size(), grad[0].size());
 
     for(int i = 0; i < nn_ip[0].size(); i++){
-        for(int j = 0; j < loss[0].size(); j++){
-            for(int k = 0; k < loss.size(); k++){
+        for(int k = 0; k < loss.size(); k++){
+            for(int j = 0; j < loss[0].size(); j++){
                 //printf("nn_ip:%f, loss:%f, ", (float)nn_ip[k][i], loss[k][j]);
-                grad[i][j] += (float)nn_ip[k][i]*loss[k][j];
+                //grad[i][j] += (float)nn_ip[k][i]*loss[k][j];
+                weight[i][j] -= (float)nn_ip[k][i]*loss[k][j];
                 //printf("i:%d, j:%d, k:%d, grad[i][j]:%f\n", i, j, k, grad[i][j]);
             }
         }
@@ -147,12 +148,14 @@ void SDNN::NNBackward(vector<vector<int> > output, vector<vector<int> > target) 
     //printf("%s\n", "before weight");
     //printf("weight.size():%d, weight[0].size():%d\n", weight.size(), weight[0].size());
     //printf("grad.size():%d, grad[0].size():%d\n", grad.size(), grad[0].size());
+    /*
     for(int i = 0; i < weight.size(); i++){
         for(int j = 0; j < weight[0].size(); j++){
             weight[i][j] -= grad[i][j];
             //printf("%f\n", weight[i][j]);
         }
     }
+     */
     //printf("%s\n", "after weight");
 }
 
