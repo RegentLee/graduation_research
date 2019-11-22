@@ -12,8 +12,13 @@ void Tester::predict(SDNN &model, std::vector<std::vector<int> > sample, int bat
     vector<vector<int> > pattern = model.GetPattern();
     vector<vector<int> > answer(sample.size(), vector<int>(pattern.size() + 1, 0));
 
-    //train
+    clock_t start, iters_start;
+    start = clock();
+
+    //test
     for(int iters = 0; iters < max_iters; iters++){
+        iters_start = clock();
+
         vector<vector<int> > input(batch_size, vector<int>(sample[0].size() - 1));
         vector<int> target(batch_size);
         vector<vector<int> > output;
@@ -36,10 +41,13 @@ void Tester::predict(SDNN &model, std::vector<std::vector<int> > sample, int bat
         }
 
         //usleep(1000000);
-        cout << "\r" << "iters: " << iters + 1 << "/" << max_iters << flush;// << string(20, ' ') ;
+        cout << "\r" << "sample: " << (iters + 1)*batch_size << "/" << sample.size()// << string(20, ' ') ;
+             << " time: " << (double)(clock() - iters_start)/CLOCKS_PER_SEC << "/" << (double)(clock() - start)/CLOCKS_PER_SEC << flush;
     }
 
     if(batch_size*max_iters != sample.size()){
+        iters_start = clock();
+
         vector<vector<int> > input(sample.size() - max_iters*batch_size, vector<int>(sample[0].size() - 1));
         vector<int> target(sample.size() - max_iters*batch_size);
         vector<vector<int> > output;
@@ -60,6 +68,9 @@ void Tester::predict(SDNN &model, std::vector<std::vector<int> > sample, int bat
                 }
             }
         }
+
+        cout << "\r" << "sample: " << sample.size() << "/" << sample.size()// << string(20, ' ') ;
+             << " time: " << (double)(clock() - iters_start)/CLOCKS_PER_SEC << "/" << (double)(clock() - start)/CLOCKS_PER_SEC << flush;
     }
 
     cout << endl;

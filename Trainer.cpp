@@ -11,7 +11,7 @@ void Trainer::fit(SDNN &model, vector<vector<int> > sample, int max_epoch, int b
     int max_iters = sample.size()/batch_size;
     vector<vector<int> > data(sample.size(), vector<int>(sample[0].size()));
 
-    clock_t start, epoch_start, iters_start;
+    clock_t start, iters_start;
     start = clock();
 
     vector<int> range(sample.size());
@@ -19,7 +19,6 @@ void Trainer::fit(SDNN &model, vector<vector<int> > sample, int max_epoch, int b
     for(int i = 0; i < sample.size(); i++) range[i] = i;
 
     for(int epoch = 0; epoch < max_epoch; epoch++){
-        epoch_start = clock();
         //サンプルの順番を変える
         shuffle(range.begin(), range.end(), mt);
         for(int i = 0; i < sample.size(); i++){
@@ -58,9 +57,7 @@ void Trainer::fit(SDNN &model, vector<vector<int> > sample, int max_epoch, int b
         }
 
         if(batch_size*max_iters != sample.size()){
-            cout << "\r" << "epoch: " << epoch + 1 << "/" << max_epoch
-                 << " iters: extra/" << max_iters //<< flush;// << string(20, ' ') ;
-                 << " time: " << (double)(clock() - start)/CLOCKS_PER_SEC << flush;
+            iters_start = clock();
 
             vector<vector<int> > input(sample.size() - max_iters*batch_size, vector<int>(sample[0].size() - 1));
             vector<int> target(sample.size() - max_iters*batch_size);
@@ -74,6 +71,10 @@ void Trainer::fit(SDNN &model, vector<vector<int> > sample, int max_epoch, int b
 
             output = model.Forward(input);
             model.Backward(output, target);
+
+            cout << "\r" << "epoch: " << epoch + 1 << "/" << max_epoch
+                 << " iters: extra/" << max_iters
+                 << " time: " << (double)(clock() - iters_start)/CLOCKS_PER_SEC << "/" << (double)(clock() - start)/CLOCKS_PER_SEC << flush;
         }
 
 
