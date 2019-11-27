@@ -86,8 +86,8 @@ vector<vector<int> > SDNN::SD(std::vector<std::vector<int> > input) {
         //for(int j = 0; j < original_pattern[0].size(); j++) nn_output[i][j] = 0;
         for(int s = 0; s < input0_size; s++){
             for(int c = s + 1; c < input0_size; c++){
-                vector<int> s_temp(original_pattern[0].size());
-                vector<int> c_temp(original_pattern[0].size());
+                vector<int> s_temp(original_pattern0_size);
+                vector<int> c_temp(original_pattern0_size);
                 int *pst = &s_temp[0];
                 int *pct = &c_temp[0];
                 int *prpc = &random_pattern[c][input[i][c]][0];
@@ -121,21 +121,24 @@ vector<vector<int> > SDNN::NNForward(vector<vector<int> > nn_input) {
     vector<vector<int> > nn_output(nn_input_size, vector<int>(original_pattern0_size, 0));
     for(int i = 0; i < nn_input_size; i++){
         for(int j = 0; j < nn_input0_size; j++){
+            if(nn_input[i][j] == 0) continue;
+            float nn_input_ij = (float)nn_input[i][j];
             float *pz = &potential[i][0];
             float *py = &weight[j][0];
             for(int k = 0; k < original_pattern0_size; k++){
                 //potential[i][k] += nn_input[i][j]*weight[j][k];
-                *pz++ += (float)nn_input[i][j]**py++;
+                //*pz++ += (float)nn_input[i][j]**py++;
+                *pz++ += nn_input_ij**py++;
             }
         }
     }
     for(int i = 0; i < nn_input_size; i++){
-        //float *pz = &potential[i][0];
-        //int *po = &nn_output[i][0];
+        float *pz = &potential[i][0];
+        int *po = &nn_output[i][0];
         for(int k = 0; k < original_pattern0_size; k++){
-            if(potential[i][k] < 0) nn_output[i][k] = -1;
-            else nn_output[i][k] = 1;
-            //*po++ = *pz++ < 0 ? -1 : 1;
+            //if(potential[i][k] < 0) nn_output[i][k] = -1;
+            //else nn_output[i][k] = 1;
+            *po++ = *pz++ < 0 ? -1 : 1;
             //nn_output[i][k] = potential[i][k] < 0 ? -1 : 1;
         }
     }
@@ -160,15 +163,20 @@ void SDNN::NNBackward(vector<vector<int> > output, vector<vector<int> > target) 
     int output_size = output.size();
     int output0_size = output[0].size();
     int weight_size = weight.size();
-    int weight0_size = weight[0].size();
+    //int weight0_size = weight[0].size();
 
     vector<vector<float> > loss(output_size, vector<float>(output0_size));
     //vector<vector<float> > grad(weight.size(), vector<float>(weight[0].size(), 0));
+    float o2 = (float)output_size*2;
     for(int i = 0; i < output_size; i++){
+        float *pl = &loss[i][0];
+        int *po = &output[i][0];
+        int *pt = &target[i][0];
         for(int j = 0; j < output0_size; j++){
             //printf("i:%d, j:%d, output:%d, target:%d, ", i, j, output[i][j], target[i][j]);
-            loss[i][j] = (float)(output[i][j] - target[i][j])/2.0;
-            loss[i][j] /= output_size;
+            //loss[i][j] = (float)(output[i][j] - target[i][j])/2.0;
+            //loss[i][j] /= output_size;
+            *pl++ += (float)(*po++ - *pt++)/o2;
             //printf("loss:%f\n", loss[i][j]);
         }
     }
@@ -181,13 +189,15 @@ void SDNN::NNBackward(vector<vector<int> > output, vector<vector<int> > target) 
     //for(int i = 0; i < nn_ip[0].size(); i++){
     for(int i = 0; i < weight_size; i++){
         for(int k = 0; k < output_size; k++){
+            if(nn_ip[k][i] == 0) continue;
+            float nn_ip_ki = (float)nn_ip[k][i];
             float *pz = &weight[i][0];
             float *py = &loss[k][0];
             for(int j = 0; j < output0_size; j++){
                 //printf("nn_ip:%f, loss:%f, ", (float)nn_ip[k][i], loss[k][j]);
                 //grad[i][j] += (float)nn_ip[k][i]*loss[k][j];
                 //weight[i][j] -= (float)nn_ip[k][i]*loss[k][j];
-                *pz++ -= (float)nn_ip[k][i]**py++;
+                *pz++ -= nn_ip_ki**py++;
                 //printf("i:%d, j:%d, k:%d, grad[i][j]:%f\n", i, j, k, grad[i][j]);
             }
         }
