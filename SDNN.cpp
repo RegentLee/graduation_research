@@ -146,7 +146,7 @@ vector<vector<int> > SDNN::NNForward(vector<vector<int> > nn_input) {
     return nn_output;
 }
 
-void SDNN::Backward(vector<vector<int> > output, vector<int> target) {
+float SDNN::Backward(vector<vector<int> > output, vector<int> target) {
     int output_size = output.size();
     int output0_size = output[0].size();
 
@@ -156,10 +156,10 @@ void SDNN::Backward(vector<vector<int> > output, vector<int> target) {
             pattern_target[i][j] = original_pattern[target[i]][j];
         }
     }
-    NNBackward(output, pattern_target);
+    return NNBackward(output, pattern_target);
 }
 
-void SDNN::NNBackward(vector<vector<int> > output, vector<vector<int> > target) {
+float SDNN::NNBackward(vector<vector<int> > output, vector<vector<int> > target) {
     int output_size = output.size();
     int output0_size = output[0].size();
     int weight_size = weight.size();
@@ -168,6 +168,8 @@ void SDNN::NNBackward(vector<vector<int> > output, vector<vector<int> > target) 
     vector<vector<float> > loss(output_size, vector<float>(output0_size));
     //vector<vector<float> > grad(weight.size(), vector<float>(weight[0].size(), 0));
     float o2 = (float)output_size*2;
+    int err = 0;
+
     for(int i = 0; i < output_size; i++){
         float *pl = &loss[i][0];
         int *po = &output[i][0];
@@ -176,6 +178,8 @@ void SDNN::NNBackward(vector<vector<int> > output, vector<vector<int> > target) 
             //printf("i:%d, j:%d, output:%d, target:%d, ", i, j, output[i][j], target[i][j]);
             //loss[i][j] = (float)(output[i][j] - target[i][j])/2.0;
             //loss[i][j] /= output_size;
+            err += abs(*po - *pt);
+            //err += *po > *pt ? 2 : *pt - *po;
             *pl++ += (float)(*po++ - *pt++)/o2;
             //printf("loss:%f\n", loss[i][j]);
         }
@@ -214,6 +218,8 @@ void SDNN::NNBackward(vector<vector<int> > output, vector<vector<int> > target) 
     }
      */
     //printf("%s\n", "after weight");
+
+    return (float)err/(float)(2*output_size*output0_size);
 }
 
 vector<vector<int> > SDNN::GetPattern() { return original_pattern; }
