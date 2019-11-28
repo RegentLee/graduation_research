@@ -10,10 +10,12 @@
 #include <ctime>
 
 #include "SDNN.h"
+#include "SDNNOpenMP.h"
 
 class Tester {
 public:
     void predict(SDNN& model, std::vector<std::vector<int> > sample, int batch_size = 32);
+    void predict(SDNNOpenMP& model, std::vector<std::vector<int> > sample, int batch_size = 1);
 };
 
 
