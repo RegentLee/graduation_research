@@ -92,21 +92,17 @@ void Tester::predict(SDNNOpenMP &model, std::vector<std::vector<int> > sample, i
     for(int iters = 0; iters < max_iters; iters++){
         iters_start = clock();
 
-        vector<int> output;
+        vector<int> one_answer;
         vector<int> input(sample[0].size() - 1);
         int target;
 
         input.assign(sample[iters].begin(), sample[iters].end() - 1);
         target = sample[iters].back();
 
-        output = model.Predict(input);
+        one_answer = model.Predict(input);
 
-        answer[iters][0] = target;
-        for(int j = 0; j < pattern.size(); j++){
-            for(int k = 0; k < pattern[0].size(); k++){
-                answer[iters][j + 1] += output[k]*pattern[j][k];
-            }
-        }
+        one_answer[0] = target;
+        answer[iters].assign(one_answer.begin(), one_answer.end());
 
         cout << "\r" << "sample: " << iters + 1 << "/" << sample.size()
              << " time: " << (double)(clock() - iters_start)/CLOCKS_PER_SEC << "/"

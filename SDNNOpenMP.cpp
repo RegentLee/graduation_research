@@ -143,12 +143,10 @@ float SDNNOpenMP::NNTrain(vector<float> nn_input, vector<float> target) {
 
     //printf("%d\n", nn_input_size);
 
-    float potential = 0;
-    float nn_output = 0;
-
-    float *pt = &target[0];
+    //float *pt = &target[0];
     for(int o = 0; o < original_pattern0_size; o++){
-        potential = 0;
+        //float *pt = &target[0];
+        float potential = 0;
         float *pni = &nn_input[0];
         float *pw = &weight[o][0];
         for(int j = 0; j < nn_input_size; j++){
@@ -157,9 +155,10 @@ float SDNNOpenMP::NNTrain(vector<float> nn_input, vector<float> target) {
             //printf("%p\n", pw);
             potential += *pni++**pw++;
         }
-        nn_output = potential < 0 ? -1.0 : 1.0;
-        //float loss = (nn_output - target[o])/2.0;
-        float loss = (nn_output - *pt++)/2.0;
+        float nn_output = potential < 0 ? -1.0 : 1.0;
+        float loss = (nn_output - target[o])/2.0;
+        //float loss = (nn_output - *(pt + o))/2.0;
+        //float loss = (nn_output - *pt++)/2.0;
         if(loss < 0.5 && loss > -0.5) continue;
         pni = &nn_input[0];
         pw = &weight[o][0];
@@ -188,13 +187,11 @@ vector<int> SDNNOpenMP::NNPredict(vector<float> nn_input) {
     int nn_input_size = nn_input.size()/2;
     int weight_size = weight[0].size(); //nn_input0_size
 
-    float potential = 0;
-
     vector<int> nn_output(original_pattern0_size);
-    //vector<int> result(original_pattern_size, 0);
+    vector<int> result(original_pattern_size + 1, 0);
 
     for(int o = 0; o < original_pattern0_size; o++){
-        potential = 0;
+        float potential = 0;
         float *pni = &nn_input[0];
         float *pw = &weight[o][0];
         for(int j = 0; j < nn_input_size; j++){
@@ -203,19 +200,21 @@ vector<int> SDNNOpenMP::NNPredict(vector<float> nn_input) {
             //printf("%p\n", pw);
             potential += *pni++**pw++;
         }
-        nn_output[o] = potential < 0 ? -1.0 : 1.0;
+        nn_output[o] = potential < 0 ? -1 : 1;
     }
 
-    /*
-    int *pr = &result[0];
+
+    //int *pr = &result[1];
     for(int i = 0; i < original_pattern_size; i++){
+        //int *pr = &result[1];
         int *po = &nn_output[0];
         int *pp = &original_pattern[i][0];
         for(int j = 0; j < original_pattern0_size; j++){
-            *pr += *po++ * *pp++;
+            result[i + 1] += *po++ * *pp++;
+            //*(pr + i) += *po++ * *pp++;
         }
-        pr++;
+        //pr++;
     }
-    */
-    return nn_output;
+
+    return result;
 }
