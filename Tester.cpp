@@ -82,8 +82,7 @@ void Tester::predict(SDNN &model, std::vector<std::vector<int> > sample, int bat
 
 void Tester::predict(SDNNOpenMP &model, std::vector<std::vector<int> > sample, int batch_size) {
     int max_iters = sample.size();
-    vector<vector<int> > pattern = model.GetPattern();
-    vector<vector<int> > answer(sample.size(), vector<int>(pattern.size() + 1, 0));
+    vector<vector<int> > answer(sample.size(), vector<int>());
 
     clock_t start, iters_start;
     start = clock();
@@ -102,7 +101,8 @@ void Tester::predict(SDNNOpenMP &model, std::vector<std::vector<int> > sample, i
         one_answer = model.Predict(input);
 
         one_answer[0] = target;
-        answer[iters].assign(one_answer.begin(), one_answer.end());
+        answer[iters].insert(answer[iters].end(), one_answer.begin(), one_answer.end());
+        //answer[iters].assign(one_answer.begin(), one_answer.end());
 
         cout << "\r" << "sample: " << iters + 1 << "/" << sample.size()
              << " time: " << (double)(clock() - iters_start)/CLOCKS_PER_SEC << "/"

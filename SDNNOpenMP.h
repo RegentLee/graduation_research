@@ -13,18 +13,17 @@ public:
     SDNNOpenMP(int input_size, std::vector<std::vector<int> > pattern);
     float Train(std::vector<int> input, int target);
     std::vector<int> Predict(std::vector<int> input);
-    std::vector<std::vector<int> > GetPattern();
 
 private:
     std::vector<std::vector<int> > original_pattern;
     std::vector<std::vector<std::vector<int> > > random_pattern;
-    std::vector<std::vector<float> > weight;
+    std::vector<std::vector<int> > weight;
 
     void MakeRandomPattern(std::vector<std::vector<int> > pattern,
                            std::vector<std::vector<std::vector<int> > >& random_pattern);
-    std::vector<float> SD(std::vector<int> input);
-    float NNTrain(std::vector<float> nn_input, std::vector<float> target);
-    std::vector<int> NNPredict(std::vector<float> nn_input);
+    std::vector<int> SD(std::vector<int> input);
+    float NNTrain(std::vector<int> nn_input, std::vector<int> target);
+    std::vector<int> NNPredict(std::vector<int> nn_input);
 };
 
 
