@@ -6,9 +6,11 @@
 
 using namespace std;
 
-SDNNOpenMP::SDNNOpenMP(int input_size, std::vector<std::vector<int> > pattern) {
+SDNNOpenMP::SDNNOpenMP(int input_size, vector<vector<int> > pattern, vector<vector<int> > w) {
     int pattern_size = pattern.size();
     int pattern0_size = pattern[0].size();
+
+    //omp_set_num_threads(24);
 
     original_pattern.resize(pattern_size);
     for(int i = 0; i < pattern_size; i++){
@@ -23,9 +25,13 @@ SDNNOpenMP::SDNNOpenMP(int input_size, std::vector<std::vector<int> > pattern) {
     }
     SDNNOpenMP::MakeRandomPattern(pattern, random_pattern);
 
-    int weight_size = input_size*(input_size - 1)*pattern0_size;
-    weight.resize(pattern0_size);
-    for(int i = 0; i < pattern0_size; i++) weight[i].resize(weight_size);
+    if(w.size() == 0) {
+        int weight_size = input_size * (input_size - 1) * pattern0_size;
+        weight.resize(pattern0_size);
+        for (int i = 0; i < pattern0_size; i++) weight[i].resize(weight_size);
+    } else {
+        weight = w;
+    }
 }
 
 void SDNNOpenMP::MakeRandomPattern(vector<vector<int> > pattern,
@@ -36,8 +42,8 @@ void SDNNOpenMP::MakeRandomPattern(vector<vector<int> > pattern,
     int random_pattern_size = random_pattern.size();
 
     vector<int> range(pattern0_size);
-    mt19937_64 mt(static_cast<unsigned int>(time(nullptr)));
-    //mt19937_64 mt(0);
+    //mt19937_64 mt(static_cast<unsigned int>(time(nullptr)));
+    mt19937_64 mt(0);
 
     for(int i = 0; i < pattern0_size; i++) range[i] = i;
     for(int i = 0; i < random_pattern_size; i++){
@@ -110,7 +116,7 @@ float SDNNOpenMP::NNTrain(vector<int> nn_input, vector<int> target) {
 
 #pragma omp parallel for
     for(int o = 0; o < original_pattern0_size; o++){
-        //float *pt = &target[0];
+        //int *pt = &target[0];
         int potential = 0;
         int *pni = &nn_input[0];
         int *pw = &weight[o][0];
@@ -180,3 +186,5 @@ vector<int> SDNNOpenMP::NNPredict(vector<int> nn_input) {
 
     return result;
 }
+
+vector<vector<int> > SDNNOpenMP::GetWeight() { return weight; }

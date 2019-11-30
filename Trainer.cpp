@@ -3,6 +3,7 @@
 //
 
 #include "Trainer.h"
+#include "csv.h"
 
 using namespace std;
 
@@ -120,4 +121,7 @@ void Trainer::fit(SDNNOpenMP &model, vector<vector<int> > sample, int max_epoch,
         }
     }
     cout << endl;
+
+    vector<vector<int> > weight = model.GetWeight();
+    csv::ToCsv(weight, "weight.csv");
 }

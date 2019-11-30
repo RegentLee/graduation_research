@@ -7,7 +7,7 @@
 
 using namespace std;
 
-void Tester::predict(SDNN &model, std::vector<std::vector<int> > sample, int batch_size) {
+void Tester::predict(SDNN &model, std::vector<std::vector<int> > sample, string fp, int batch_size) {
     int max_iters = sample.size()/batch_size;
     vector<vector<int> > pattern = model.GetPattern();
     vector<vector<int> > answer(sample.size(), vector<int>(pattern.size() + 1, 0));
@@ -77,10 +77,10 @@ void Tester::predict(SDNN &model, std::vector<std::vector<int> > sample, int bat
 
     cout << endl;
 
-    csv::ToCsv(answer, "result.csv");
+    csv::ToCsv(answer, fp);
 }
 
-void Tester::predict(SDNNOpenMP &model, std::vector<std::vector<int> > sample, int batch_size) {
+void Tester::predict(SDNNOpenMP &model, std::vector<std::vector<int> > sample, string fp, int batch_size) {
     int max_iters = sample.size();
     vector<vector<int> > answer(sample.size(), vector<int>());
 
@@ -111,5 +111,5 @@ void Tester::predict(SDNNOpenMP &model, std::vector<std::vector<int> > sample, i
 
     cout << endl;
 
-    csv::ToCsv(answer, "result.csv");
+    csv::ToCsv(answer, fp);
 }

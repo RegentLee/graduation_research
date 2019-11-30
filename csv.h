@@ -7,6 +7,9 @@
 
 #include <vector>
 #include <string>
+#include <iostream>
+#include <sstream>
+#include <fstream>
 
 namespace csv {
     // int 値の csv ファイルを読み込みや書き込み

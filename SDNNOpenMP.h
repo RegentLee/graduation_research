@@ -7,12 +7,16 @@
 
 #include <vector>
 #include <random>
+#include <algorithm>
+#include <ctime>
+//#include <omp.h>
 
 class SDNNOpenMP {
 public:
-    SDNNOpenMP(int input_size, std::vector<std::vector<int> > pattern);
+    SDNNOpenMP(int input_size, std::vector<std::vector<int> > pattern, std::vector<std::vector<int> > w = std::vector<std::vector<int> >());
     float Train(std::vector<int> input, int target);
     std::vector<int> Predict(std::vector<int> input);
+    std::vector<std::vector<int> > GetWeight();
 
 private:
     std::vector<std::vector<int> > original_pattern;
