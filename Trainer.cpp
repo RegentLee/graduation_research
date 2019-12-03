@@ -7,7 +7,7 @@
 
 using namespace std;
 
-void Trainer::fit(SDNN &model, vector<vector<int> > sample, int max_epoch, int batch_size) {
+void Trainer::fit(SDNN &model, vector<vector<int> > sample, string fp, int max_epoch, int batch_size) {
 
     int max_iters = sample.size()/batch_size;
     vector<vector<int> > data(sample.size(), vector<int>(sample[0].size()));
@@ -82,7 +82,7 @@ void Trainer::fit(SDNN &model, vector<vector<int> > sample, int max_epoch, int b
     cout << endl;
 }
 
-void Trainer::fit(SDNNOpenMP &model, vector<vector<int> > sample, int max_epoch, int batch_size) {
+void Trainer::fit(SDNNOpenMP &model, vector<vector<int> > sample, string fp, int max_epoch, int batch_size) {
 
     int max_iters = sample.size();
     vector<vector<int> > data(sample.size(), vector<int>(sample[0].size()));
@@ -92,6 +92,7 @@ void Trainer::fit(SDNNOpenMP &model, vector<vector<int> > sample, int max_epoch,
 
     vector<int> range(sample.size());
     mt19937_64 mt(static_cast<unsigned int>(time(nullptr)));
+    //mt19937_64 mt(0);
     for(int i = 0; i < sample.size(); i++) range[i] = i;
 
     for(int epoch = 0; epoch < max_epoch; epoch++){
@@ -123,5 +124,5 @@ void Trainer::fit(SDNNOpenMP &model, vector<vector<int> > sample, int max_epoch,
     cout << endl;
 
     vector<vector<int> > weight = model.GetWeight();
-    csv::ToCsv(weight, "weight.csv");
+    csv::ToCsv(weight, fp);
 }

@@ -9,7 +9,10 @@
 #include <random>
 #include <algorithm>
 #include <ctime>
-//#include <omp.h>
+
+#ifdef _OPENMP
+#include <omp.h>
+#endif
 
 class SDNNOpenMP {
 public:

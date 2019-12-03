@@ -10,7 +10,9 @@ SDNNOpenMP::SDNNOpenMP(int input_size, vector<vector<int> > pattern, vector<vect
     int pattern_size = pattern.size();
     int pattern0_size = pattern[0].size();
 
-    //omp_set_num_threads(24);
+#ifdef _OPENMP
+    omp_set_num_threads(24);
+#endif
 
     original_pattern.resize(pattern_size);
     for(int i = 0; i < pattern_size; i++){
@@ -93,6 +95,40 @@ vector<int> SDNNOpenMP::SD(vector<int> input) {
     return nn_input;
 }
 
+/*vector<int> SDNNOpenMP::SD(vector<int> input) {
+    int input_size = input.size();
+    int original_pattern0_size = original_pattern[0].size();
+
+    vector<int> nn_input(1, 0);
+    for(int s = 0; s < input_size; s++){
+        for(int c = s + 1; c < input_size; c++){
+            int *prpc = &random_pattern[c][input[c]][0];
+            int *prps = &random_pattern[s][input[s]][0];
+            int *pops = &original_pattern[input[s]][0];
+            int *popc = &original_pattern[input[c]][0];
+            for(int j = 0; j < original_pattern0_size; j++) {
+                int st = ((1 + *prpc++) / 2) * *pops++;
+                if (st == 0) {
+                    nn_input.back()++;
+                } else {
+                    nn_input.push_back(st);
+                    nn_input.push_back(0);
+                }
+
+                int ct = ((1 + *prps++) / 2) * *popc++;
+                if(ct == 0){
+                    nn_input.back()++;
+                } else {
+                    nn_input.push_back(ct);
+                    nn_input.push_back(0);
+                }
+            }
+        }
+    }
+
+    return nn_input;
+}*/
+
 float SDNNOpenMP::Train(vector<int> input, int target) {
     int output_size = input.size();
     int output0_size = original_pattern[0].size();
@@ -113,8 +149,9 @@ float SDNNOpenMP::NNTrain(vector<int> nn_input, vector<int> target) {
     int original_pattern0_size = original_pattern[0].size();
     int nn_input_size = nn_input.size()/2;
     // int weight_size = weight[0].size(); //nn_input0_size
-
+#ifdef _OPENMP
 #pragma omp parallel for
+#endif
     for(int o = 0; o < original_pattern0_size; o++){
         //int *pt = &target[0];
         int potential = 0;
@@ -158,8 +195,9 @@ vector<int> SDNNOpenMP::NNPredict(vector<int> nn_input) {
 
     vector<int> nn_output(original_pattern0_size);
     vector<int> result(original_pattern_size + 1, 0);
-
+#ifdef _OPENMP
 #pragma omp parallel for
+#endif
     for(int o = 0; o < original_pattern0_size; o++){
         int potential = 0;
         int *pni = &nn_input[0];
@@ -172,7 +210,9 @@ vector<int> SDNNOpenMP::NNPredict(vector<int> nn_input) {
     }
 
     //int *pr = &result[1];
+#ifdef _OPENMP
 #pragma omp parallel for
+#endif
     for(int i = 0; i < original_pattern_size; i++){
         //int *pr = &result[1];
         int *po = &nn_output[0];
