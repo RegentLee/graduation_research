@@ -14,11 +14,12 @@ SDNNOpenMP::SDNNOpenMP(int input_size, vector<vector<int> > pattern, vector<vect
     omp_set_num_threads(24);
 #endif
 
-    original_pattern.resize(pattern_size);
+    /*original_pattern.resize(pattern_size);
     for(int i = 0; i < pattern_size; i++){
         original_pattern[i].resize(pattern0_size);
         original_pattern[i].assign(pattern[i].begin(), pattern[i].end());
-    }
+    }*/
+    original_pattern.insert(original_pattern.end(), pattern.begin(), pattern.end());
 
     random_pattern.resize(input_size);
     for(int i = 0; i < input_size; i++){
