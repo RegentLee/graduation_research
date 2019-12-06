@@ -113,3 +113,37 @@ void Tester::predict(SDNNOpenMP &model, std::vector<std::vector<int> > sample, s
 
     csv::ToCsv(answer, fp);
 }
+
+void Tester::predict(SDNNBiOpenMP &model, std::vector<std::vector<int> > sample, string fp, int batch_size) {
+    int max_iters = sample.size();
+    vector<vector<int> > answer(sample.size(), vector<int>());
+
+    clock_t start, iters_start;
+    start = clock();
+
+    //test
+    for(int iters = 0; iters < max_iters; iters++){
+        iters_start = clock();
+
+        vector<int> one_answer;
+        vector<int> input(sample[0].size() - 1);
+        int target;
+
+        input.assign(sample[iters].begin(), sample[iters].end() - 1);
+        target = sample[iters].back();
+
+        one_answer = model.Predict(input);
+
+        one_answer[0] = target;
+        answer[iters].insert(answer[iters].end(), one_answer.begin(), one_answer.end());
+        //answer[iters].assign(one_answer.begin(), one_answer.end());
+
+        cout << "\r" << "sample: " << iters + 1 << "/" << sample.size()
+             << " time: " << (double)(clock() - iters_start)/CLOCKS_PER_SEC << "/"
+             << (double)(clock() - start)/CLOCKS_PER_SEC << string(20, ' ') << flush;
+    }
+
+    cout << endl;
+
+    csv::ToCsv(answer, fp);
+}
