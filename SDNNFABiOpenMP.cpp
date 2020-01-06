@@ -227,13 +227,13 @@ float SDNNFABiOpenMP::NNTrain(vector<int> nn_input, vector<int> target) {
     int original_pattern0_size = original_pattern[0].size();
     int nn_input_size = nn_input.size()/2;
     int element = weight[0].size();
-    vector<vector<NEURON_OUTPUT> > result0(original_pattern0_size, vector<NEURON_OUTPUT>(element));
-    vector<vector<NEURON_OUTPUT> > result1(original_pattern0_size, vector<NEURON_OUTPUT>(element));
 
 #ifdef _OPENMP
 #pragma omp parallel for
 #endif
     for(int o = 0; o < original_pattern0_size; o++){
+        vector<NEURON_OUTPUT> result0(element);
+        vector<NEURON_OUTPUT> result1(element);
         int neuron_output_sum = -10;
         for(int e = 0; e < element; e++){
             int potential = 0;
@@ -245,10 +245,10 @@ float SDNNFABiOpenMP::NNTrain(vector<int> nn_input, vector<int> target) {
             }
 
             neuron_output_sum += (potential >= 0);
-            result0[o][e].potential = (potential >= 0) ? potential : 0x8fffff;
-            result0[o][e].index = e;
-            result1[o][e].potential = (potential < 0) ? -potential : 0x8fffff;
-            result1[o][e].index = e;
+            result0[e].potential = (potential >= 0) ? potential : 0x8fffff;
+            result0[e].index = e;
+            result1[e].potential = (potential < 0) ? -potential : 0x8fffff;
+            result1[e].index = e;
         }
         if(neuron_output_sum < -8) neuron_output_sum = -8;
         else if(neuron_output_sum > 8) neuron_output_sum = 8;
@@ -257,10 +257,10 @@ float SDNNFABiOpenMP::NNTrain(vector<int> nn_input, vector<int> target) {
         int error = neuron_output_sum - target[o];
 
         if(error > 0) {
-            partial_sort(result0[o].begin(), result0[o].begin() + error, result0[o].end(), cmp);
+            partial_sort(result0.begin(), result0.begin() + error, result0.end(), cmp);
             for(int e = 0; e < error; e++){
                 int *pni = &nn_input[0];
-                int *pw = &weight[o][result0[o][e].index][0];
+                int *pw = &weight[o][result0[e].index][0];
                 for(int j = 0; j < nn_input_size; j++){
                     pw += *pni++;
                     *pw++ -= *pni++;
@@ -269,10 +269,10 @@ float SDNNFABiOpenMP::NNTrain(vector<int> nn_input, vector<int> target) {
         }
         else if(error < 0) {
             error = -error;
-            partial_sort(result1[o].begin(), result1[o].begin() + error, result1[o].end(), cmp);
+            partial_sort(result1.begin(), result1.begin() + error, result1.end(), cmp);
             for(int e = 0; e < error; e++){
                 int *pni = &nn_input[0];
-                int *pw = &weight[o][result1[o][e].index][0];
+                int *pw = &weight[o][result1[e].index][0];
                 for(int j = 0; j < nn_input_size; j++){
                     pw += *pni++;
                     *pw++ += *pni++;
