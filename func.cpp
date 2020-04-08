@@ -518,6 +518,9 @@ struct param_list ReadParam(){
             ifs >> param.test_sample_file;
         } else if(temp == "<pattern>") {
             ifs >> param.pattern_file;
+        } else if(temp == "<thread>") {
+            ifs >> temp;
+            param.thread = stoi(temp);
         } else if(temp == "<train_result>") {
             ifs >> param.train_result_file;
         } else if(temp == "<test_result>") {

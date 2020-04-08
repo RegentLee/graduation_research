@@ -12,12 +12,18 @@
 #include <fstream>
 
 namespace csv {
-    // int 値の csv ファイルを読み込みや書き込み
+    // 读取 int 值的csv文件
+    // int 値の csv ファイルを読み込
     void ReadCsv(std::vector<std::vector<int> >& map, std::string fp);
+    // 写入 int 值的csv文件
+    // int 値の csv ファイルを書き込み
     void ToCsv(std::vector<std::vector<int> >& map, std::string fp);
 
-    // float 値の csv ファイルを読み込みや書き込み
+    // 读取 float 值的csv文件
+    // float 値の csv ファイルを読み込み
     void ReadCsv(std::vector<std::vector<float> >& map, std::string fp);
+    // 写入 float 值的csv文件
+    // float 値の csv ファイルを書き込み
     void ToCsv(std::vector<std::vector<float> >& map, std::string fp);
 }
 

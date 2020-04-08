@@ -16,7 +16,7 @@
 
 class SDNNBiOpenMP {
 public:
-    SDNNBiOpenMP(int input_size, std::vector<std::vector<int> > pattern, std::vector<std::vector<int> > w = std::vector<std::vector<int> >());
+    SDNNBiOpenMP(int input_size, std::vector<std::vector<int> > pattern, int thread = 1, std::vector<std::vector<int> > w = std::vector<std::vector<int> >());
     float Train(std::vector<int> input, int target);
     std::vector<int> Predict(std::vector<int> input);
     std::vector<std::vector<int> > GetWeight();

@@ -6,16 +6,19 @@
 
 using namespace std;
 
-SDNNBiOpenMP::SDNNBiOpenMP(int input_size, vector<vector<int> > pattern, vector<vector<int> > w) {
+SDNNBiOpenMP::SDNNBiOpenMP(int input_size, vector<vector<int> > pattern, int thread, vector<vector<int> > w) {
     int pattern_size = pattern.size();
     int pattern0_size = pattern[0].size();
 
 #ifdef _OPENMP
-    omp_set_num_threads(24);
+    omp_set_num_threads(thread);
 #endif
-
+    // 保存原始pattern
+    // 元のパターンを保存
     original_pattern.insert(original_pattern.end(), pattern.begin(), pattern.end());
 
+    // 打乱原始pattern并保存
+    // 元のパターンをランダムにしてから保存
     bi_pattern.resize(input_size + 1);
     for(int i = 0; i < input_size + 1; i++){
         bi_pattern[i].resize(pattern_size);
@@ -23,6 +26,8 @@ SDNNBiOpenMP::SDNNBiOpenMP(int input_size, vector<vector<int> > pattern, vector<
     }
     SDNNBiOpenMP::MakeBiPattern(pattern, bi_pattern);
 
+    // 初始化权重或读取权重
+    // 重みを初期化か読み取る
     if(w.size() == 0) {
         int weight_size = input_size * (input_size - 1) * pattern0_size;
         weight.resize(pattern0_size);
@@ -44,6 +49,8 @@ void SDNNBiOpenMP::MakeBiPattern(vector<vector<int> > og_pattern,
     //mt19937_64 mt(static_cast<unsigned int>(time(nullptr)));
     mt19937_64 mt(0);
 
+    // 保存原始pattern
+    // 元のパターンを保存
     for(int j = 0; j < og_pattern_size; j++){
         for(int k = 0; k < og_pattern0_size_4; k++){
             for(int l = 0; l < 4; l++){
@@ -70,6 +77,9 @@ void SDNNBiOpenMP::MakeBiPattern(vector<vector<int> > og_pattern,
             //printf("%d\n", bi_pattern[bi_pattern_size_1][j][k]);
         }
     }
+
+    // 打乱原始pattern并保存
+    // 元のパターンをランダムにしてから保存
     for(int i = 0; i < og_pattern0_size; i++) range[i] = i;
     for(int i = 0; i < bi_pattern_size_1; i++){
         shuffle(range.begin(), range.end(), mt);
@@ -106,6 +116,10 @@ vector<int> SDNNBiOpenMP::SD(vector<int> input) {
     int original_pattern0_size_4 = original_pattern[0].size()/4;
     int bi_og_pattern_position = bi_pattern.size() - 1;
 
+    // 不感化
+    // x,           1/-1, x,           1/-1, ...
+    // 隔了多少个零，1或-1， 隔了多少个零，1或-1，...
+    // 何個0を離れているか、1/-1, ...
     vector<int> nn_input(1, 0);
     for(int s = 0; s < input_size; s++){
         for(int c = s + 1; c < input_size; c++){
@@ -263,6 +277,9 @@ vector<int> SDNNBiOpenMP::NNPredict(vector<int> nn_input) {
 
     vector<int> nn_output(original_pattern0_size);
     vector<int> result(original_pattern_size + 1, 0);
+
+    // 计算各个出力素子的值
+    // 各出力素子の値を計算
 #ifdef _OPENMP
 #pragma omp parallel for
 #endif
@@ -278,6 +295,8 @@ vector<int> SDNNBiOpenMP::NNPredict(vector<int> nn_input) {
     }
 
     //int *pr = &result[1];
+    // 计算输出和各pattern的内积
+    // 出力と各パターンの内積を計算
 #ifdef _OPENMP
 #pragma omp parallel for
 #endif

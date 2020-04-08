@@ -24,6 +24,7 @@ struct param_list{
     std::string train_sample_file;
     std::string test_sample_file;
     std::string pattern_file;
+    int thread;
     std::string train_result_file;
     std::string test_result_file;
     std::string save_weight_file;

@@ -13,14 +13,16 @@
 #include "SDNN.h"
 #include "SDNNOpenMP.h"
 #include "SDNNBiOpenMP.h"
-#include "SDNNFABiOpenMP.h"
+//#include "SDNNFABiOpenMP.h"
+#include "SDNNWithUpdateOpenMP.h"
 
 class Tester {
 public:
     void predict(SDNN& model, std::vector<std::vector<int> > sample, std::string fp, int batch_size = 32);
     void predict(SDNNOpenMP& model, std::vector<std::vector<int> > sample, std::string fp, int batch_size = 1);
     void predict(SDNNBiOpenMP& model, std::vector<std::vector<int> > sample, std::string fp, int batch_size = 1);
-    void predict(SDNNFABiOpenMP& model, std::vector<std::vector<int> > sample, std::string fp, int batch_size = 1);
+    //void predict(SDNNFABiOpenMP& model, std::vector<std::vector<int> > sample, std::string fp, int batch_size = 1);
+    void predict(SDNNWithUpdateOpenMP& model, std::vector<std::vector<int> > sample, std::string fp, int batch_size = 1);
 };
 
 
