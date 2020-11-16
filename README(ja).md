@@ -1,10 +1,10 @@
-#input file(train_sample.csv, test_sample.csv)
+# input file(train_sample.csv, test_sample.csv)
 前は入力、最後の一列は目標値
 
-#output file(train_result.csv, test_result.csv)
+# output file(train_result.csv, test_result.csv)
 一列目は目標値、後ろはSDNNの出力と各単語patternとの内積
 
-#param.txt
+# param.txt
 \<train_sample\> 学習サンプル(train_sample.csv)\
 \<test_sample\> テストサンプル(test_sample.csv)\
 \<pattern\> pattern(pattern.csv)\
@@ -23,6 +23,6 @@
 - もしプログラムが read end を出力した後にエラーが出た場合、\
 ファイル名が正しくない可能性が高い
 
-#SDNNOpenMP 和 SDNNBiOpenMP
+# SDNNOpenMP 和 SDNNBiOpenMP
 単語のパターン長は4の倍数の場合 SDNNBiOpenMP を使うことができる\
 他の場合は SDNNOpenMP を使ってください
